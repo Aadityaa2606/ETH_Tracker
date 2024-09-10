@@ -1,14 +1,14 @@
-require("dotenv").config(); // Load environment variables from .env file
+require("dotenv").config();
 const { Alchemy, Network, AlchemySubscription } = require("alchemy-sdk");
-const Deposit = require("../models/Deposit"); // Make sure the path is correct
+const Deposit = require("../models/Deposit");
 const Web3 = require("web3");
 const sendTelegramNotification = require("./telegramService");
 
+
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
-// Retrieve API key from environment variables
 if (!ALCHEMY_API_KEY) {
-  throw new Error("ALCHEMY_API_KEY is not defined in the .env file");
+    throw new Error("ALCHEMY_API_KEY is not defined in the .env file");
 }
 
 const settings = {
@@ -18,6 +18,10 @@ const settings = {
 
 const alchemy = new Alchemy(settings);
 
+/**
+ * This function creates a websocket connection to Alchemy and subscribes to transactions for the Beacon Deposit Contract.
+ * When a new transaction is received, it processes the data and saves it to MongoDB.
+ */
 const setupAlchemyWebSocket = () => {
   // Subscribe to transactions for the Beacon Deposit Contract
   alchemy.ws.on(
@@ -37,8 +41,10 @@ const setupAlchemyWebSocket = () => {
   console.log("Alchemy WebSocket subscription set up");
 };
 
-
-
+/**
+ * This function saves the deposit transaction to MongoDB and sends a Telegram notification.
+ * @param {*} receivedTransaction
+ */
 async function saveDeposit(receivedTransaction) {
   try {
     // Clear the collection
@@ -48,10 +54,10 @@ async function saveDeposit(receivedTransaction) {
     const { transaction } = receivedTransaction;
     const depositData = {
       blockNumber: parseInt(transaction.blockNumber, 16), // Convert hex to decimal
-      blockTimestamp: new Date(), // Assuming current timestamp, adjust if you have this info
+      blockTimestamp: new Date(),
       fee: parseInt(transaction.gasPrice, 16), // Convert hex to decimal
       hash: transaction.hash, // Transaction hash
-      pubkey: transaction.from, // Assuming "from" is the pubkey
+      pubkey: transaction.from,
     };
 
     // Create a new deposit instance
@@ -63,17 +69,17 @@ async function saveDeposit(receivedTransaction) {
     // Send Telegram notification
     const message = `New transaction saved:\nHash: ${depositData.hash}\nBlock Number: ${depositData.blockNumber}\nFee: ${depositData.fee}`;
     await sendTelegramNotification(message);
+
     console.log("Transaction saved successfully:", deposit);
   } catch (error) {
     console.error("Error saving transaction:", error);
   }
 }
-// Export functions
+
 module.exports = {
   setupAlchemyWebSocket,
   getDepositHistory,
 };
-
 
 // Received transaction: {
 //   removed: false,
