@@ -37,40 +37,8 @@ const setupAlchemyWebSocket = () => {
   console.log("Alchemy WebSocket subscription set up");
 };
 
-/**
- * Function to fetch deposit history from Alchemy
- */
-// const getDepositHistory = async () => {
-//   try {
-//     // Get the latest block number
-//     const latestBlock = await alchemy.core.getBlockNumber();
-
-//     // Fetch asset transfers from the latest block to the Beacon Deposit Contract
-//     const data = await alchemy.core.getAssetTransfers({
-//       fromBlock: `0x${(latestBlock - 1).toString(16)}`, // One block before the latest block
-//       toBlock: `0x${(latestBlock - 1).toString(16)}`, // Ensure it fetches only from the latest block
-//       toAddress: "0x00000000219ab540356cBB839Cbe05303d7705Fa", // Beacon Deposit Contract address
-//       category: ["external"], // Only external transfers
-//       order: "desc", // Order by latest first
-//     });
-
-//     // console.log("Deposit history from latest block:", data["transfers"]);
-//     console.log("Total deposits:", data["transfers"].length);
-//     console.log("Latest block:", latestBlock);  
-
-//     // Process each transfer
-//     for (const transfer of data.transfers) {
-//       // Process and save the deposit data to MongoDB
-//       // saveDeposit(transfer);
-//     //   console.log("Deposit processed:", transfer);
-//     }
-//   } catch (error) {
-//     console.error("Error fetching deposit history:", error);
-//   }
-// };
 
 
-// Function to save deposit data to MongoDB
 async function saveDeposit(receivedTransaction) {
   try {
     // Clear the collection
