@@ -4,11 +4,10 @@ const Deposit = require("../models/Deposit");
 const Web3 = require("web3");
 const sendTelegramNotification = require("./telegramService");
 
-
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
 if (!ALCHEMY_API_KEY) {
-    throw new Error("ALCHEMY_API_KEY is not defined in the .env file");
+  throw new Error("ALCHEMY_API_KEY is not defined in the .env file");
 }
 
 const settings = {
@@ -24,15 +23,21 @@ const alchemy = new Alchemy(settings);
  */
 const setupAlchemyWebSocket = () => {
   // Subscribe to transactions for the Beacon Deposit Contract
+  const targetAddress = "0x00000000219ab540356cBB839Cbe05303d7705Fa";
+
   alchemy.ws.on(
     {
       method: AlchemySubscription.MINED_TRANSACTIONS,
-      addresses: ["0x00000000219ab540356cBB839Cbe05303d7705Fa"],
+      addresses: [
+        {
+          to: targetAddress,
+        },
+      ],
       includeRemoved: false,
       hashesOnly: false,
     },
     (tx) => {
-      console.log("Received transaction:", tx);
+      console.log("Received deposit transaction to target address:", tx);
       // Process and save the deposit data to MongoDB
       saveDeposit(tx);
     }
@@ -48,7 +53,7 @@ const setupAlchemyWebSocket = () => {
 async function saveDeposit(receivedTransaction) {
   try {
     // Clear the collection
-    await Deposit.deleteMany({});
+    // await Deposit.deleteMany({});
 
     // Extract relevant fields and convert where necessary
     const { transaction } = receivedTransaction;
@@ -78,7 +83,6 @@ async function saveDeposit(receivedTransaction) {
 
 module.exports = {
   setupAlchemyWebSocket,
-  getDepositHistory,
 };
 
 // Received transaction: {
