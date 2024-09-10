@@ -5,6 +5,7 @@ const Web3 = require("web3");
 const sendTelegramNotification = require("./telegramService");
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
+const TARGET_ADDRESS = process.env.TARGET_ADDRESS;
 
 if (!ALCHEMY_API_KEY) {
   throw new Error("ALCHEMY_API_KEY is not defined in the .env file");
@@ -30,7 +31,7 @@ const setupAlchemyWebSocket = () => {
       method: AlchemySubscription.MINED_TRANSACTIONS,
       addresses: [
         {
-          to: targetAddress,
+          to: TARGET_ADDRESS,
         },
       ],
       includeRemoved: false,
